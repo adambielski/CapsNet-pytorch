@@ -6,7 +6,7 @@ The hyperparameters and data augmentation strategy strictly follow the paper.
 
 ## Requirements
 
-Only [PyTorch](http://pytorch.org/) with torchvision is required (tested on pytorch 0.2.0). Jupyter and matplotlib is required to run the notebook with visualizations.
+Only [PyTorch](http://pytorch.org/) with torchvision is required (tested on pytorch 0.2.0 and 0.3.0). Jupyter and matplotlib is required to run the notebook with visualizations.
 
 ## Usage
 
@@ -36,7 +36,7 @@ The network trained with reconstruction and 3 routing iterations on MNIST datase
 
 ## Visualizations
 
-We can visualize visualizations of digit reconstructions from DigitCaps (e.g. Figure 3 in the paper)
+We can create visualizations of digit reconstructions from DigitCaps (e.g. Figure 3 in the paper)
 
 ![Reconstructions](images/reconstructions.png)
 
