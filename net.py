@@ -116,7 +116,7 @@ class ReconstructionNet(nn.Module):
         mask = Variable(torch.zeros((x.size()[0], self.n_classes)), requires_grad=False)
         if next(self.parameters()).is_cuda:
             mask = mask.cuda()
-        mask.scatter_(1, target.data.view(-1, 1), 1.)
+        mask.scatter_(1, target.view(-1, 1), 1.)
         mask = mask.unsqueeze(2)
         x = x * mask
         x = x.view(-1, self.n_dim * self.n_classes)
@@ -146,7 +146,9 @@ class MarginLoss(nn.Module):
         self.lambda_ = lambda_
 
     def forward(self, lengths, targets, size_average=True):
-        t = torch.zeros(lengths.size()).long().cuda()
+        t = torch.zeros(lengths.size()).long()
+        if targets.is_cuda:
+            t = t.cuda()
         t = t.scatter_(1, targets.data.view(-1, 1), 1)
         targets = Variable(t)
         losses = targets.float() * F.relu(self.m_pos - lengths).pow(2) + \
@@ -224,7 +226,7 @@ if __name__ == '__main__':
         for batch_idx, (data, target) in enumerate(train_loader):
             if args.cuda:
                 data, target = data.cuda(), target.cuda()
-            data, target = Variable(data, requires_grad=True), Variable(target, requires_grad=False)
+            data, target = Variable(data), Variable(target, requires_grad=False)
             optimizer.zero_grad()
             if args.with_reconstruction:
                 output, probs = model(data, target)
@@ -240,7 +242,6 @@ if __name__ == '__main__':
                 print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                     epoch, batch_idx * len(data), len(train_loader.dataset),
                            100. * batch_idx / len(train_loader), loss.data[0]))
-
 
     def test():
         model.eval()
