@@ -1,12 +1,9 @@
-from __future__ import print_function
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import math
 
 from torch.optim import lr_scheduler
-from torch.autograd import Variable
 
 
 def squash(x):
@@ -165,14 +162,14 @@ if __name__ == '__main__':
 
     # Training settings
     parser = argparse.ArgumentParser(description='CapsNet with MNIST')
-    parser.add_argument('--batch-size', type=int, default=128, metavar='N',
+    parser.add_argument('--batch-size', type=int, default=64, metavar='N',
                         help='input batch size for training (default: 64)')
-    parser.add_argument('--test-batch-size', type=int, default=1000, metavar='N',
+    parser.add_argument('--test-batch-size', type=int, default=64, metavar='N',
                         help='input batch size for testing (default: 1000)')
-    parser.add_argument('--epochs', type=int, default=250, metavar='N',
+    parser.add_argument('--epochs', type=int, default=100, metavar='N',
                         help='number of epochs to train (default: 10)')
     parser.add_argument('--lr', type=float, default=0.001, metavar='LR',
-                        help='learning rate (default: 0.01)')
+                        help='learning rate (default: 0.001)')
     parser.add_argument('--no-cuda', action='store_true', default=False,
                         help='disables CUDA training')
     parser.add_argument('--seed', type=int, default=1, metavar='S',
@@ -241,7 +238,7 @@ if __name__ == '__main__':
             if batch_idx % args.log_interval == 0:
                 print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                     epoch, batch_idx * len(data), len(train_loader.dataset),
-                           100. * batch_idx / len(train_loader), loss.data[0]))
+                           100. * batch_idx / len(train_loader), loss.item()))
 
     def test():
         model.eval()
@@ -254,12 +251,12 @@ if __name__ == '__main__':
 
             if args.with_reconstruction:
                 output, probs = model(data, target)
-                reconstruction_loss = F.mse_loss(output, data.view(-1, 784), size_average=False).data[0]
-                test_loss += loss_fn(probs, target, size_average=False).data[0]
+                reconstruction_loss = F.mse_loss(output, data.view(-1, 784), size_average=False).item()
+                test_loss += loss_fn(probs, target, size_average=False).item()
                 test_loss += reconstruction_alpha * reconstruction_loss
             else:
                 output, probs = model(data)
-                test_loss += loss_fn(probs, target, size_average=False).data[0]
+                test_loss += loss_fn(probs, target, size_average=False).item()
 
             pred = probs.data.max(1, keepdim=True)[1]  # get the index of the max probability
             correct += pred.eq(target.data.view_as(pred)).cpu().sum()
